@@ -49,17 +49,17 @@ The database file is created at `backend/db/sqlite.db` by default. Override with
 
 ### Scripts
 
-| Script             | Description                              |
-|--------------------|------------------------------------------|
-| `pnpm dev`         | Start backend and frontend concurrently  |
-| `pnpm dev:backend` | Backend only                             |
-| `pnpm dev:frontend`| Frontend only                            |
-| `pnpm build`       | Production build for both apps           |
-| `pnpm lint`        | Run Biome across all packages            |
-| `pnpm lint:fix`    | Auto-fix lint issues                     |
-| `pnpm db:seed`     | Create DB and seed sample products       |
-| `pnpm db:migrate`  | Apply pending migrations                 |
-| `pnpm db:push`     | Push schema changes directly (dev only)  |
+| Script              | Description                             |
+| ------------------- | --------------------------------------- |
+| `pnpm dev`          | Start backend and frontend concurrently |
+| `pnpm dev:backend`  | Backend only                            |
+| `pnpm dev:frontend` | Frontend only                           |
+| `pnpm build`        | Production build for both apps          |
+| `pnpm lint`         | Run Biome across all packages           |
+| `pnpm lint:fix`     | Auto-fix lint issues                    |
+| `pnpm db:seed`      | Create DB and seed sample products      |
+| `pnpm db:migrate`   | Apply pending migrations                |
+| `pnpm db:push`      | Push schema changes directly (dev only) |
 
 ## API
 
@@ -67,19 +67,19 @@ All endpoints are prefixed with `/api`.
 
 ### Orders
 
-| Method  | Path                          | Description                               |
-|---------|-------------------------------|-------------------------------------------|
-| `GET`   | `/api/orders`                 | List all orders                           |
-| `GET`   | `/api/orders/:orderId`        | Get a specific order                      |
-| `POST`  | `/api/orders`                 | Create an order (idempotent by `orderId`) |
-| `PATCH` | `/api/orders/:orderId/advance`| Advance order to the next state           |
-| `PATCH` | `/api/orders/:orderId/fail`   | Mark a non-terminal order as failed       |
+| Method  | Path                           | Description                               |
+| ------- | ------------------------------ | ----------------------------------------- |
+| `GET`   | `/api/orders`                  | List all orders                           |
+| `GET`   | `/api/orders/:orderId`         | Get a specific order                      |
+| `POST`  | `/api/orders`                  | Create an order (idempotent by `orderId`) |
+| `PATCH` | `/api/orders/:orderId/advance` | Advance order to the next state           |
+| `PATCH` | `/api/orders/:orderId/fail`    | Mark a non-terminal order as failed       |
 
 ### Products
 
-| Method | Path            | Description              |
-|--------|-----------------|--------------------------|
-| `GET`  | `/api/products` | List products            |
+| Method | Path            | Description   |
+| ------ | --------------- | ------------- |
+| `GET`  | `/api/products` | List products |
 
 ### Create Order
 
@@ -95,12 +95,12 @@ Content-Type: application/json
 }
 ```
 
-| Field         | Type      | Required | Default | Description                                                                 |
-|---------------|-----------|----------|---------|-----------------------------------------------------------------------------|
-| `orderId`     | `string`  | yes      | —       | Unique identifier for the order                                             |
-| `productSku`  | `string`  | yes      | —       | Must match an existing product SKU                                          |
-| `quantity`    | `integer` | yes      | —       | Must be ≥ 1                                                                 |
-| `autoProcess` | `boolean` | no       | `false` | If `true`, the order advances through states automatically after creation   |
+| Field         | Type      | Required | Default | Description                                                               |
+| ------------- | --------- | -------- | ------- | ------------------------------------------------------------------------- |
+| `orderId`     | `string`  | yes      | —       | Unique identifier for the order                                           |
+| `productSku`  | `string`  | yes      | —       | Must match an existing product SKU                                        |
+| `quantity`    | `integer` | yes      | —       | Must be ≥ 1                                                               |
+| `autoProcess` | `boolean` | no       | `false` | If `true`, the order advances through states automatically after creation |
 
 - **201** — order created.
 - **200** — `orderId` already exists; returns the existing order unchanged.
@@ -115,11 +115,13 @@ POST /api/orders
       ▼
   [received]  ──────────────▶  [processing]  ──────────────▶  [delivered]
       │           manual or          │           manual or
-      │          auto (~500ms)       │          auto (~300ms)
-      │                             │ insufficient stock
-      │                             │ or unexpected error
-      ▼                             ▼
-  [failed] ◀────────────────── [failed]
+      │          auto (~500ms)       │           auto (~300ms)
+      │                              │
+      │                              │ insufficient stock
+      │                              │ or unexpected error
+      │                              │
+      ▼                              ▼
+  [failed] ◀───────────────────── [failed]
   (manual)
 ```
 
@@ -199,12 +201,15 @@ curl -X POST http://localhost:3000/api/orders \
 ## Technical Decisions
 
 ### Idempotent order creation
+
 `order_id` has a `UNIQUE` constraint so the `POST /api/orders` endpoint returns the existing order (HTTP 200) if the ID is already present, making it safe to call multiple times without side effects.
 
 ### OrderFulfillmentService for the delivery transaction
+
 The `processing → delivered` step needs to touch two tables atomically. Rather than leaking a transaction context (`tx`) through service and repository signatures, or coupling modules by exporting repositories, a dedicated `OrderFulfillmentService` owns the transaction. It injects the DB connection directly, what is a justified trade-off for a single and clearly scoped use case.
 
 ### Event-driven processing
+
 `OrdersProcessor` listens to `order.received` and `order.processing` events, decoupling the HTTP layer from the processing logic. In the future, replacing the `sleep` delays with BullMQ (for example) would require changes only inside the processor, not in the service or controller.
 
 ## What Happens If the Server Crashes Mid-Processing?

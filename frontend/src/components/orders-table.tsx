@@ -120,7 +120,7 @@ export function OrdersTable() {
                   </td>
                   <td className="px-4 py-3 text-gray-700 sm:px-6">{order.quantity}</td>
                   <td className="px-4 py-3 sm:px-6">
-                    <StatusBadge status={order.status} />
+                    <StatusBadge status={order.status} failureReason={order.failureReason} />
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-500 sm:px-6">
                     {formatDate(order.createdAt)}

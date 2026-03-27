@@ -46,7 +46,7 @@ export class OrderFulfillmentService {
       });
     } catch {
       // Transaction rolled back, mark order as failed
-      return this.ordersRepository.update(order.orderId, { status: "failed" });
+      return this.ordersRepository.update(order.orderId, { status: "failed", failureReason: "system" });
     }
   }
 }

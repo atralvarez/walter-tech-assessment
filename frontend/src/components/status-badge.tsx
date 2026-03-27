@@ -1,5 +1,5 @@
 import { cn } from "../lib/utils";
-import type { OrderStatus } from "../types";
+import type { FailureReason, OrderStatus } from "../types";
 
 const statusConfig: Record<OrderStatus, { label: string; className: string }> = {
   received: {
@@ -22,10 +22,23 @@ const statusConfig: Record<OrderStatus, { label: string; className: string }> = 
 
 interface StatusBadgeProps {
   status: OrderStatus;
+  failureReason?: FailureReason | null;
 }
 
-export function StatusBadge({ status }: StatusBadgeProps) {
+export function StatusBadge({ status, failureReason }: StatusBadgeProps) {
   const config = statusConfig[status];
+
+  if (status === "failed" && failureReason) {
+    return (
+      <span className="inline-flex overflow-hidden rounded-full border border-rose-200 text-xs font-medium">
+        <span className="bg-rose-50 px-2.5 py-0.5 text-rose-700">{config.label}</span>
+        <span className="border-l border-rose-200 bg-gray-50 px-2 py-0.5 text-gray-500">
+          {failureReason === "system" ? "System" : "Manual"}
+        </span>
+      </span>
+    );
+  }
+
   return (
     <span
       className={cn(

@@ -15,6 +15,13 @@
       "when": 1774634330711,
       "tag": "0001_sturdy_proemial_gods",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774635348982,
+      "tag": "0002_chilly_menace",
+      "breakpoints": true
     }
   ]
 }

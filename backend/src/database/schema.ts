@@ -23,6 +23,7 @@ export const orders = sqliteTable("orders", {
 		.notNull()
 		.default("received"),
 	autoProcess: integer("auto_process", { mode: "boolean" }).notNull().default(false),
+	failureReason: text("failure_reason"),
 	createdAt: text("created_at").notNull().default(sql`(CURRENT_TIMESTAMP)`),
 	updatedAt: text("updated_at").notNull().default(sql`(CURRENT_TIMESTAMP)`),
 });

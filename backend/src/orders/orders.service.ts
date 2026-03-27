@@ -88,7 +88,7 @@ export class OrdersService {
         `Order '${orderId}' is in terminal state '${order.status}' and cannot be failed`,
       );
     }
-    return this.ordersRepository.update(orderId, { status: "failed" });
+    return this.ordersRepository.update(orderId, { status: "failed", failureReason: "manual" });
   }
 
   private getNextStatus(current: Order["status"]): Order["status"] | null {

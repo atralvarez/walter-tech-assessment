@@ -1,5 +1,7 @@
 export type OrderStatus = "received" | "processing" | "delivered" | "failed";
 
+export type FailureReason = "system" | "manual";
+
 export interface Order {
   id: number;
   orderId: string;
@@ -7,6 +9,7 @@ export interface Order {
   quantity: number;
   status: OrderStatus;
   autoProcess: boolean;
+  failureReason: FailureReason | null;
   createdAt: string;
   updatedAt: string;
 }
