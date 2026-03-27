@@ -17,5 +17,15 @@ export const api = {
 
     get: (orderId: string): Promise<Order> =>
       fetch(`${BASE_URL}/orders/${orderId}`).then((r) => handleResponse<Order>(r)),
+
+    advance: (orderId: string): Promise<Order> =>
+      fetch(`${BASE_URL}/orders/${orderId}/advance`, { method: "PATCH" }).then((r) =>
+        handleResponse<Order>(r),
+      ),
+
+    fail: (orderId: string): Promise<Order> =>
+      fetch(`${BASE_URL}/orders/${orderId}/fail`, { method: "PATCH" }).then((r) =>
+        handleResponse<Order>(r),
+      ),
   },
 };

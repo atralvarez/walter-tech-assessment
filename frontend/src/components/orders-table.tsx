@@ -1,4 +1,5 @@
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, ChevronRight, RefreshCw, XCircle } from "lucide-react";
+import { useOrderActions } from "../hooks/use-order-actions";
 import { useOrders } from "../hooks/use-orders";
 import { StatusBadge } from "./status-badge";
 
@@ -20,6 +21,7 @@ export function OrdersTable() {
     refetch,
     isFetching,
   } = useOrders();
+  const { advance, fail } = useOrderActions();
 
   return (
     <section className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm">
@@ -97,6 +99,9 @@ export function OrdersTable() {
                 <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-6">
                   Created
                 </th>
+                <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 sm:px-6">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -119,6 +124,38 @@ export function OrdersTable() {
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-500 sm:px-6">
                     {formatDate(order.createdAt)}
+                  </td>
+                  <td className="px-4 py-3 sm:px-6">
+                    {order.status !== "delivered" && order.status !== "failed" ? (
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => advance.mutate(order.orderId)}
+                          disabled={
+                            (advance.isPending && advance.variables === order.orderId) ||
+                            (fail.isPending && fail.variables === order.orderId)
+                          }
+                          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <ChevronRight className="h-3 w-3" />
+                          Advance
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => fail.mutate(order.orderId)}
+                          disabled={
+                            (advance.isPending && advance.variables === order.orderId) ||
+                            (fail.isPending && fail.variables === order.orderId)
+                          }
+                          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <XCircle className="h-3 w-3" />
+                          Fail
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-gray-300">—</span>
+                    )}
                   </td>
                 </tr>
               ))}
