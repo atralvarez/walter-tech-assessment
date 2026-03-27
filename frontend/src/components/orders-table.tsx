@@ -135,7 +135,7 @@ export function OrdersTable() {
                             (advance.isPending && advance.variables === order.orderId) ||
                             (fail.isPending && fail.variables === order.orderId)
                           }
-                          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-gray-900 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
                         >
                           <ChevronRight className="h-3 w-3" />
                           Advance
@@ -147,7 +147,7 @@ export function OrdersTable() {
                             (advance.isPending && advance.variables === order.orderId) ||
                             (fail.isPending && fail.variables === order.orderId)
                           }
-                          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-red-200 bg-white px-2 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
                         >
                           <XCircle className="h-3 w-3" />
                           Fail

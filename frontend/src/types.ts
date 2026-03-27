@@ -6,6 +6,7 @@ export interface Order {
   productSku: string;
   quantity: number;
   status: OrderStatus;
+  autoProcess: boolean;
   createdAt: string;
   updatedAt: string;
 }
