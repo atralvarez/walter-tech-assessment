@@ -204,7 +204,8 @@ curl -X POST http://localhost:3000/api/orders \
 
 ### Idempotent order creation
 
-`order_id` has a `UNIQUE` constraint so the `POST /api/orders` endpoint returns the existing order (HTTP 200) if the ID is already present, making it safe to call multiple times without side effects.
+`order_id` has a `UNIQUE` constraint so the `POST /api/orders` endpoint returns the existing order (HTTP 200) if the ID is already present. This approach provides a simple way of idempotency valid for this scope. In a production system, this could be improved using idempotency keys with persisted responses to guarantee full request/response consistency and detect payload mismatches.
+
 
 ### OrderFulfillmentService for the delivery transaction
 
@@ -229,10 +230,18 @@ The order processing flow has two steps:
 
 ## What I'd do with more time
 
+- **Stronger idempotency**: evolve the current `orderId` based approach into a dedicated idempotency key mechanism, ensuring exact replay of responses and better handling of concurrent requests.
+
 - **Proper transaction management**: the current `OrderFulfillmentService` is a pragmatic workaround. It injects the DB connection directly to run a cross-table transaction, bypassing the repository layer. The cleaner solution would be using something like `nestjs-cls` (Continuation Local Storage): store the active transaction in the CLS context so repositories automatically use it when one is in progress, without leaking `tx` through method signatures. This enables a `@Transactional()` decorator pattern and keeps repositories fully unaware of transaction orchestration.
+
 - **Startup recovery**: on boot, query all `processing` orders and re-emit their events to resume processing automatically after a crash.
+
 - **Real job queue**: replace the current approach with BullMQ + Redis for retries with backoff, job visibility, and horizontal scaling. The processor interface is already isolated for this swap.
+
 - **WebSockets**: replace TanStack Query polling with a WebSocket connection so the UI updates the instant an order's status changes.
+
 - **Shared types package**: `packages/shared-types/` to eliminate the type duplication between `backend/src/database/schema.ts` and `frontend/src/types.ts`.
+
 - **Tests**: unit tests for `OrdersService` (state transitions, idempotency) and `OrderFulfillmentService` (stock logic), plus integration tests for the API endpoints.
+
 - **Pagination**: the orders list grows unbounded; cursor-based pagination and status/date filters would be needed in production.
