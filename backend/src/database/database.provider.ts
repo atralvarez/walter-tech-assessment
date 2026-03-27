@@ -1,7 +1,7 @@
+import path from "node:path";
 import { Logger } from "@nestjs/common";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import path from "node:path";
 import * as schema from "./schema";
 
 export const DATABASE_TOKEN = "DATABASE";

@@ -5,21 +5,21 @@ import App from "./App.tsx";
 import "./index.css";
 
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 2,
-      staleTime: 2000,
-    },
-  },
+	defaultOptions: {
+		queries: {
+			retry: 2,
+			staleTime: 2000,
+		},
+	},
 });
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element not found");
 
 createRoot(root).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
-  </StrictMode>,
+	<StrictMode>
+		<QueryClientProvider client={queryClient}>
+			<App />
+		</QueryClientProvider>
+	</StrictMode>,
 );

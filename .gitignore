@@ -5,7 +5,8 @@ build
 .env.local
 .DS_Store
 .idea
-.vscode
+.vscode/*
+!.vscode/settings.json
 *.log
 .history
 .pnpm-store

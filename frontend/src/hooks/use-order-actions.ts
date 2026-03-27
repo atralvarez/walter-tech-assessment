@@ -3,36 +3,36 @@ import { toast } from "sonner";
 import { api } from "../lib/api";
 
 export function useOrderActions() {
-  const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["orders"] });
+	const invalidate = () =>
+		queryClient.invalidateQueries({ queryKey: ["orders"] });
 
-  const advance = useMutation({
-    mutationFn: api.orders.advance,
-    onSuccess: (order) => {
-      if (order.status === "failed") {
-        toast.error("Order failed: system error during fulfillment");
-      } else {
-        toast.success(`Order advanced to "${order.status}"`);
-      }
-      invalidate();
-    },
-    onError: (err: Error) => {
-      toast.error(err.message);
-    },
-  });
+	const advance = useMutation({
+		mutationFn: api.orders.advance,
+		onSuccess: (order) => {
+			if (order.status === "failed") {
+				toast.error("Order failed: system error during fulfillment");
+			} else {
+				toast.success(`Order advanced to "${order.status}"`);
+			}
+			invalidate();
+		},
+		onError: (err: Error) => {
+			toast.error(err.message);
+		},
+	});
 
-  const fail = useMutation({
-    mutationFn: api.orders.fail,
-    onSuccess: () => {
-      toast.warning("Order marked as failed manually");
-      invalidate();
-    },
-    onError: (err: Error) => {
-      toast.error(err.message);
-    },
-  });
+	const fail = useMutation({
+		mutationFn: api.orders.fail,
+		onSuccess: () => {
+			toast.warning("Order marked as failed manually");
+			invalidate();
+		},
+		onError: (err: Error) => {
+			toast.error(err.message);
+		},
+	});
 
-  return { advance, fail };
+	return { advance, fail };
 }

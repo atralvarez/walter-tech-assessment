@@ -1,7 +1,7 @@
+import path from "node:path";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import path from "node:path";
-import { products, type Product } from "../schema";
+import { type Product, products } from "../schema";
 
 const dbPath =
 	process.env.DATABASE_PATH ?? path.resolve(__dirname, "../../../db/sqlite.db");

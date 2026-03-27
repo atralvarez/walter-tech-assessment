@@ -1,12 +1,14 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Inject } from "@nestjs/common";
 import { ProductsService } from "./products.service";
 
 @Controller("products")
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+	constructor(
+		@Inject(ProductsService) private readonly productsService: ProductsService,
+	) {}
 
-  @Get()
-  findAll() {
-    return this.productsService.findAll();
-  }
+	@Get()
+	findAll() {
+		return this.productsService.findAll();
+	}
 }
