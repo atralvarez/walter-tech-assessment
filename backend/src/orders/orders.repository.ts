@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { eq, sql } from "drizzle-orm";
 import { DATABASE_TOKEN, type DrizzleDB } from "../database/database.provider";
-import { type NewOrder, orders } from "../database/schema";
+import { type NewOrder, Order, orders } from "../database/schema";
 
 @Injectable()
 export class OrdersRepository {
@@ -18,5 +18,14 @@ export class OrdersRepository {
   insert(values: NewOrder) {
     const [inserted] = this.db.insert(orders).values(values).returning().all();
     return inserted;
+  }
+
+  update(orderId: string, values: Partial<Order>) {
+    return this.db
+      .update(orders)
+      .set({ ...values, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+      .where(eq(orders.orderId, orderId))
+      .returning()
+      .get();
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { type Order } from "../database/schema";
 import { ProductsService } from "../products/products.service";
 import type { CreateOrderDto } from "./dto/create-order.dto";
@@ -44,5 +44,38 @@ export class OrdersService {
     });
 
     return { order: inserted, created: true };
+  }
+
+  /**
+   * Advances an order to the next state:
+   *   received -> processing: just a status update
+   *   processing -> delivered: runs the stock-check + deduction transaction
+   */
+  advance(orderId: string): Order {
+    const order = this.findOne(orderId);
+    const nextStatus = this.getNextStatus(order.status);
+
+    if (!nextStatus) {
+      throw new BadRequestException(
+        `Order '${orderId}' is in terminal state '${order.status}' and cannot be advanced`,
+      );
+    }
+
+    // TODO: Transitioning to delivered requires the stock-check transaction
+    // if (order.status === "processing") {
+    //   return this.deliverWithStockDeduction(order);
+    // }
+
+    return this.ordersRepository.update(orderId, { status: nextStatus });
+  }
+
+  private getNextStatus(current: Order["status"]): Order["status"] | null {
+    const transitions: Record<string, Order["status"] | null> = {
+      received: "processing",
+      processing: "delivered",
+      delivered: null,
+      failed: null,
+    };
+    return transitions[current] ?? null;
   }
 }
