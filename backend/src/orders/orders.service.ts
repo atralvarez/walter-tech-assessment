@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { type Order } from "../database/schema";
 import { ProductsService } from "../products/products.service";
 import { OrderFulfillmentService } from "./order-fulfillment.service";
@@ -35,7 +39,9 @@ export class OrdersService {
 
     const product = this.productsService.findBySku(dto.productSku);
     if (!product) {
-      throw new NotFoundException(`Product with SKU '${dto.productSku}' not found`);
+      throw new NotFoundException(
+        `Product with SKU '${dto.productSku}' not found`,
+      );
     }
 
     const inserted = this.ordersRepository.insert({
@@ -43,6 +49,7 @@ export class OrdersService {
       productSku: dto.productSku,
       quantity: dto.quantity,
       status: "received",
+      autoProcess: dto.autoProcess ?? false,
     });
 
     return { order: inserted, created: true };
@@ -71,6 +78,9 @@ export class OrdersService {
     return this.ordersRepository.update(orderId, { status: nextStatus });
   }
 
+  /**
+   * Marks an order as failed
+   */
   fail(orderId: string): Order {
     const order = this.findOne(orderId);
     if (order.status === "delivered" || order.status === "failed") {

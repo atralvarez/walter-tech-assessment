@@ -1,4 +1,4 @@
-import { IsInt, IsString, Min } from "class-validator";
+import { IsBoolean, IsInt, IsOptional, IsString, Min } from "class-validator";
 
 export class CreateOrderDto {
   @IsString()
@@ -10,4 +10,8 @@ export class CreateOrderDto {
   @IsInt()
   @Min(1)
   quantity: number;
+
+  @IsBoolean()
+  @IsOptional()
+  autoProcess?: boolean;
 }

@@ -67,11 +67,13 @@ All endpoints are prefixed with `/api`.
 
 ### Orders
 
-| Method | Path                  | Description                               |
-|--------|-----------------------|-------------------------------------------|
-| `GET`  | `/api/orders`         | List all orders                           |
-| `GET`  | `/api/orders/:orderId`| Get a specific order                      |
-| `POST` | `/api/orders`         | Create an order (idempotent by `orderId`) |
+| Method  | Path                          | Description                               |
+|---------|-------------------------------|-------------------------------------------|
+| `GET`   | `/api/orders`                 | List all orders                           |
+| `GET`   | `/api/orders/:orderId`        | Get a specific order                      |
+| `POST`  | `/api/orders`                 | Create an order (idempotent by `orderId`) |
+| `PATCH` | `/api/orders/:orderId/advance`| Advance order to the next state           |
+| `PATCH` | `/api/orders/:orderId/fail`   | Mark a non-terminal order as failed       |
 
 ### Products
 
@@ -88,39 +90,50 @@ Content-Type: application/json
 {
   "orderId": "ORD-001",
   "productSku": "TSHIRT-WHT-S",
-  "quantity": 2
+  "quantity": 2,
+  "autoProcess": false
 }
 ```
 
-- **201** — order created, processing starts automatically.
+| Field         | Type      | Required | Default | Description                                                                 |
+|---------------|-----------|----------|---------|-----------------------------------------------------------------------------|
+| `orderId`     | `string`  | yes      | —       | Unique identifier for the order                                             |
+| `productSku`  | `string`  | yes      | —       | Must match an existing product SKU                                          |
+| `quantity`    | `integer` | yes      | —       | Must be ≥ 1                                                                 |
+| `autoProcess` | `boolean` | no       | `false` | If `true`, the order advances through states automatically after creation   |
+
+- **201** — order created.
 - **200** — `orderId` already exists; returns the existing order unchanged.
 
 ## Order Processing
 
-Orders advance through states automatically after creation:
+Orders can advance through states manually (default) or automatically if `autoProcess: true` is set at creation time.
 
 ```
 POST /api/orders
       │
       ▼
-  [received]  ──(~500ms)──▶  [processing]  ──(~300ms)──▶  [delivered]
-                                                 │
-                                          insufficient stock
-                                          or unexpected error
-                                                 │
-                                                 ▼
-                                             [failed]
+  [received]  ──────────────▶  [processing]  ──────────────▶  [delivered]
+      │           manual or          │           manual or
+      │          auto (~500ms)       │          auto (~300ms)
+      │                             │ insufficient stock
+      │                             │ or unexpected error
+      ▼                             ▼
+  [failed] ◀────────────────── [failed]
+  (manual)
 ```
 
-Order processing is event-driven (using `@nestjs/event-emitter`): the order creation endpoint returns immediately once created, then the status advances in the background. Now there are some delays to simulate async processing without requiring a real queue.
+With `autoProcess: false` (the default), orders stay in each state until manually advanced from the UI or via the API. With `autoProcess: true`, the processor advances them automatically with short delays to simulate async processing.
+
+Order processing is event-driven (using `@nestjs/event-emitter`): the order creation endpoint returns immediately once created, then the status advances in the background if `autoProcess` is enabled.
 
 The `processing → delivered` transition runs inside a SQLite transaction, where the product stock is checked and deducted atomically. If stock is insufficient, the transaction is rolled back and the order moves to `failed` with no stock deducted. Any unexpected error also results in `failed` status.
 
 ## Try It Out
 
-### Happy path: order delivered
+### Manual flow: advance from the UI
 
-`TSHIRT-WHT-S` has 42 units in stock after seeding. This order will advance automatically to `delivered` and deduct 2 units.
+Create an order without `autoProcess` (or with `autoProcess: false`). It will stay in `received` until you click **Advance** or **Fail** in the UI.
 
 ```bash
 curl -X POST http://localhost:3000/api/orders \
@@ -128,10 +141,32 @@ curl -X POST http://localhost:3000/api/orders \
   -d '{"orderId": "ORD-001", "productSku": "TSHIRT-WHT-S", "quantity": 2}'
 ```
 
+Open the UI at http://localhost:5173 and use the **Advance** button to move the order through `received → processing → delivered`, or **Fail** to mark it as failed at any point.
+
+You can also do it via the API:
+
+```bash
+# Advance to next state
+curl -X PATCH http://localhost:3000/api/orders/ORD-001/advance
+
+# Or mark as failed
+curl -X PATCH http://localhost:3000/api/orders/ORD-001/fail
+```
+
+### Auto-processing: order delivered automatically
+
+Pass `autoProcess: true` to let the order advance on its own. `TSHIRT-WHT-S` has 42 units in stock after seeding — this will reach `delivered` and deduct 2 units.
+
+```bash
+curl -X POST http://localhost:3000/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"orderId": "ORD-002", "productSku": "TSHIRT-WHT-S", "quantity": 2, "autoProcess": true}'
+```
+
 Wait ~1 second, then check the result:
 
 ```bash
-curl http://localhost:3000/api/orders/ORD-001
+curl http://localhost:3000/api/orders/ORD-002
 # → { "status": "delivered", ... }
 ```
 
@@ -142,11 +177,11 @@ curl http://localhost:3000/api/orders/ORD-001
 ```bash
 curl -X POST http://localhost:3000/api/orders \
   -H "Content-Type: application/json" \
-  -d '{"orderId": "ORD-002", "productSku": "JACKET-BLK-L", "quantity": 10}'
+  -d '{"orderId": "ORD-003", "productSku": "JACKET-BLK-L", "quantity": 10, "autoProcess": true}'
 ```
 
 ```bash
-curl http://localhost:3000/api/orders/ORD-002
+curl http://localhost:3000/api/orders/ORD-003
 # → { "status": "failed", ... }
 ```
 

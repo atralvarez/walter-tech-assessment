@@ -8,6 +8,13 @@
       "when": 1774613097647,
       "tag": "0000_nebulous_fixer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1774634330711,
+      "tag": "0001_sturdy_proemial_gods",
+      "breakpoints": true
     }
   ]
 }

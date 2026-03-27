@@ -1,0 +1,1 @@
+ALTER TABLE `orders` ADD `auto_process` integer DEFAULT false NOT NULL;
