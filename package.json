@@ -1,0 +1,17 @@
+{
+	"name": "walter-tech-assessment",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"dev": "concurrently -n backend,frontend -c blue,green \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+		"dev:backend": "pnpm --filter backend dev",
+		"dev:frontend": "pnpm --filter frontend dev",
+		"build": "pnpm --filter backend build && pnpm --filter frontend build",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.9",
+		"concurrently": "^9.1.2"
+	}
+}

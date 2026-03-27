@@ -1,0 +1,8 @@
+packages:
+  - "backend"
+  - "frontend"
+
+onlyBuiltDependencies:
+  - "@biomejs/biome"
+  - "@nestjs/core"
+  - esbuild
