@@ -1,130 +1,31 @@
-import { useState } from "react";
-import heroImg from "./assets/hero.png";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "./assets/vite.svg";
-import "./App.css";
+import { Package } from "lucide-react";
+import { Toaster } from "sonner";
+import { OrdersTable } from "./components/orders-table";
 
-function App() {
-	const [count, setCount] = useState(0);
+export default function App() {
+  return (
+    <div className="min-h-screen">
+      <header className="border-b border-gray-200/80 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-4 sm:px-6">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-gray-900">
+            <Package className="size-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">
+              Walter Tech Assessment
+            </h1>
+            <p className="text-xs text-gray-500">
+              Real-time order tracking and management
+            </p>
+          </div>
+        </div>
+      </header>
 
-	return (
-		<>
-			<section id="center">
-				<div className="hero">
-					<img src={heroImg} className="base" width="170" height="179" alt="" />
-					<img src={reactLogo} className="framework" alt="React logo" />
-					<img src={viteLogo} className="vite" alt="Vite logo" />
-				</div>
-				<div>
-					<h1>Get started</h1>
-					<p>
-						Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-					</p>
-				</div>
-				<button
-					type="button"
-					className="counter"
-					onClick={() => setCount((count) => count + 1)}
-				>
-					Count is {count}
-				</button>
-			</section>
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <OrdersTable />
+      </main>
 
-			<div className="ticks" />
-
-			<section id="next-steps">
-				<div id="docs">
-					<svg className="icon" role="presentation" aria-hidden="true">
-						<use href="/icons.svg#documentation-icon" />
-					</svg>
-					<h2>Documentation</h2>
-					<p>Your questions, answered</p>
-					<ul>
-						<li>
-							<a href="https://vite.dev/" target="_blank" rel="noreferrer">
-								<img className="logo" src={viteLogo} alt="" />
-								Explore Vite
-							</a>
-						</li>
-						<li>
-							<a href="https://react.dev/" target="_blank" rel="noreferrer">
-								<img className="button-icon" src={reactLogo} alt="" />
-								Learn more
-							</a>
-						</li>
-					</ul>
-				</div>
-				<div id="social">
-					<svg className="icon" role="presentation" aria-hidden="true">
-						<use href="/icons.svg#social-icon" />
-					</svg>
-					<h2>Connect with us</h2>
-					<p>Join the Vite community</p>
-					<ul>
-						<li>
-							<a
-								href="https://github.com/vitejs/vite"
-								target="_blank"
-								rel="noreferrer"
-							>
-								<svg
-									className="button-icon"
-									role="presentation"
-									aria-hidden="true"
-								>
-									<use href="/icons.svg#github-icon" />
-								</svg>
-								GitHub
-							</a>
-						</li>
-						<li>
-							<a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-								<svg
-									className="button-icon"
-									role="presentation"
-									aria-hidden="true"
-								>
-									<use href="/icons.svg#discord-icon" />
-								</svg>
-								Discord
-							</a>
-						</li>
-						<li>
-							<a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-								<svg
-									className="button-icon"
-									role="presentation"
-									aria-hidden="true"
-								>
-									<use href="/icons.svg#x-icon" />
-								</svg>
-								X.com
-							</a>
-						</li>
-						<li>
-							<a
-								href="https://bsky.app/profile/vite.dev"
-								target="_blank"
-								rel="noreferrer"
-							>
-								<svg
-									className="button-icon"
-									role="presentation"
-									aria-hidden="true"
-								>
-									<use href="/icons.svg#bluesky-icon" />
-								</svg>
-								Bluesky
-							</a>
-						</li>
-					</ul>
-				</div>
-			</section>
-
-			<div className="ticks" />
-			<section id="spacer" />
-		</>
-	);
+      <Toaster position="top-right" richColors />
+    </div>
+  );
 }
-
-export default App;
