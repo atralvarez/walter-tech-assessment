@@ -1,11 +1,13 @@
 # Walter Tech Assessment
 
+![app screenshot](https://github.com/user-attachments/assets/beb4f4a2-6dc8-4a51-8323-d1f88c63193d)
+
 ## Project structure
 
 ```
 walter-tech-assessment/
-├── backend/    # NestJS REST API — port 3000
-└── frontend/   # React + Vite SPA — port 5173
+├── backend/    # NestJS REST API - port 3000
+└── frontend/   # React + Vite SPA - port 5173
 ```
 
 ## Stack
@@ -97,13 +99,13 @@ Content-Type: application/json
 
 | Field         | Type      | Required | Default | Description                                                               |
 | ------------- | --------- | -------- | ------- | ------------------------------------------------------------------------- |
-| `orderId`     | `string`  | yes      | —       | Unique identifier for the order                                           |
-| `productSku`  | `string`  | yes      | —       | Must match an existing product SKU                                        |
-| `quantity`    | `integer` | yes      | —       | Must be ≥ 1                                                               |
+| `orderId`     | `string`  | yes      | -       | Unique identifier for the order                                           |
+| `productSku`  | `string`  | yes      | -       | Must match an existing product SKU                                        |
+| `quantity`    | `integer` | yes      | -       | Must be ≥ 1                                                               |
 | `autoProcess` | `boolean` | no       | `false` | If `true`, the order advances through states automatically after creation |
 
-- **201** — order created.
-- **200** — `orderId` already exists; returns the existing order unchanged.
+- **201**: order created.
+- **200**: `orderId` already exists; returns the existing order unchanged.
 
 ## Order Processing
 
@@ -157,7 +159,7 @@ curl -X PATCH http://localhost:3000/api/orders/ORD-001/fail
 
 ### Auto-processing: order delivered automatically
 
-Pass `autoProcess: true` to let the order advance on its own. `TSHIRT-WHT-S` has 42 units in stock after seeding — this will reach `delivered` and deduct 2 units.
+Pass `autoProcess: true` to let the order advance on its own. `TSHIRT-WHT-S` has 42 units in stock after seeding so this will reach `delivered` and deduct 2 units.
 
 ```bash
 curl -X POST http://localhost:3000/api/orders \
@@ -216,8 +218,8 @@ The `processing → delivered` step needs to touch two tables atomically. Rather
 
 The order processing flow has two steps:
 
-1. `received → processing` — only a status update, no stock touched.
-2. `processing → delivered` — stock check + deduction inside a SQLite transaction.
+1. `received → processing`: only a status update, no stock touched.
+2. `processing → delivered`: stock check + deduction inside a SQLite transaction.
 
 **Crash between step 1 and step 2:** the order stays in `processing` with no stock deducted. SQLite's WAL mode ensures no partial writes. The order could be manually advanced through an endpoint like `PATCH /api/orders/:orderId/advance` to re-run the stock-check transaction.
 
