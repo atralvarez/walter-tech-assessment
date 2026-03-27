@@ -38,9 +38,14 @@ export class OrdersProcessor {
     await sleep(300);
 
     try {
-      this.ordersService.advance(orderId);
+      const order = this.ordersService.advance(orderId);
+      if (order.status === "delivered") {
+        this.logger.log(`Order '${orderId}' delivered successfully`);
+      } else {
+        this.logger.warn(`Order '${orderId}' could not be delivered, status: ${order.status}`);
+      }
     } catch (err) {
-      this.logger.error(`Failed to complete order '${orderId}': ${err}`);
+      this.logger.error(`Unexpected error completing order '${orderId}': ${err}`);
     }
   }
 }

@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { type Order } from "../database/schema";
 import { ProductsService } from "../products/products.service";
+import { OrderFulfillmentService } from "./order-fulfillment.service";
 import type { CreateOrderDto } from "./dto/create-order.dto";
 import { OrdersRepository } from "./orders.repository";
 
@@ -8,6 +9,7 @@ import { OrdersRepository } from "./orders.repository";
 export class OrdersService {
   constructor(
     private readonly ordersRepository: OrdersRepository,
+    private readonly fulfillmentService: OrderFulfillmentService,
     private readonly productsService: ProductsService,
   ) {}
 
@@ -49,7 +51,7 @@ export class OrdersService {
   /**
    * Advances an order to the next state:
    *   received -> processing: just a status update
-   *   processing -> delivered: runs the stock-check + deduction transaction
+   *   processing -> delivered: runs the stock-check + deduction transaction (via the fulfillment service)
    */
   advance(orderId: string): Order {
     const order = this.findOne(orderId);
@@ -61,10 +63,10 @@ export class OrdersService {
       );
     }
 
-    // TODO: Transitioning to delivered requires the stock-check transaction
-    // if (order.status === "processing") {
-    //   return this.deliverWithStockDeduction(order);
-    // }
+    // If the order is in the processing state, use the fulfillment service to deliver or fail the order properly
+    if (order.status === "processing") {
+      return this.fulfillmentService.deliver(order);
+    }
 
     return this.ordersRepository.update(orderId, { status: nextStatus });
   }
