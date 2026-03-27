@@ -1,6 +1,20 @@
 # Walter Tech Assessment
 
-![app screenshot](https://github.com/user-attachments/assets/beb4f4a2-6dc8-4a51-8323-d1f88c63193d)
+## Contents
+
+- [Project structure](#project-structure)
+- [Stack](#stack)
+- [Getting Started](#getting-started)
+- [API](#api)
+- [Order Processing](#order-processing)
+- [Try It Out](#try-it-out)
+- [Technical Decisions](#technical-decisions)
+- [What Happens If the Server Crashes Mid-Processing?](#what-happens-if-the-server-crashes-mid-processing)
+- [What I'd do with more time](#what-id-do-with-more-time)
+
+## App screenshot
+
+![App screenshot](https://github.com/user-attachments/assets/beb4f4a2-6dc8-4a51-8323-d1f88c63193d)
 
 ## Project structure
 
