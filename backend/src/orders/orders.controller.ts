@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Res,
 } from "@nestjs/common";
@@ -26,6 +27,16 @@ export class OrdersController {
   @Get(":orderId")
   findOne(@Param("orderId") orderId: string) {
     return this.ordersService.findOne(orderId);
+  }
+
+  @Patch(":orderId/advance")
+  advance(@Param("orderId") orderId: string) {
+    return this.ordersService.advance(orderId);
+  }
+
+  @Patch(":orderId/fail")
+  fail(@Param("orderId") orderId: string) {
+    return this.ordersService.fail(orderId);
   }
 
   @Post()

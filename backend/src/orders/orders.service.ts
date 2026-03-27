@@ -71,6 +71,16 @@ export class OrdersService {
     return this.ordersRepository.update(orderId, { status: nextStatus });
   }
 
+  fail(orderId: string): Order {
+    const order = this.findOne(orderId);
+    if (order.status === "delivered" || order.status === "failed") {
+      throw new BadRequestException(
+        `Order '${orderId}' is in terminal state '${order.status}' and cannot be failed`,
+      );
+    }
+    return this.ordersRepository.update(orderId, { status: "failed" });
+  }
+
   private getNextStatus(current: Order["status"]): Order["status"] | null {
     const transitions: Record<string, Order["status"] | null> = {
       received: "processing",
